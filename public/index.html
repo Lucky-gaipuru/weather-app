@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroTemp | Premium Weather Intelligence Dashboard</title>
+  <meta name="description" content="A high-fidelity weather application featuring real-time data, forecasts, custom alerts, favorites tracking, and secure user profiles.">
+  
+  <!-- Premium Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Chart.js CDN for beautiful forecast charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="theme-default">
+  
+  <!-- Background Ambient Glow Blobs -->
+  <div class="glow-bg">
+    <div class="blob blob-1" id="blob1"></div>
+    <div class="blob blob-2" id="blob2"></div>
+    <div class="blob blob-3" id="blob3"></div>
+  </div>
+
+  <!-- Main App Wrapper -->
+  <div class="app-container">
+
+    <!-- 1. Authentication View (Login/Register Card) -->
+    <div class="auth-view container-center" id="authView">
+      <div class="auth-card glass-panel fade-in">
+        <div class="auth-header">
+          <div class="logo">
+            <i data-lucide="cloud-sun" class="logo-icon text-gradient"></i>
+            <span class="logo-text">AERO<span>TEMP</span></span>
+          </div>
+          <p class="auth-subtitle">Premium Weather Analytics & Forecasts</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form active">
+          <h2 class="form-title">Welcome Back</h2>
+          <div class="form-group">
+            <label for="loginUser">Username</label>
+            <div class="input-wrapper">
+              <i data-lucide="user" class="input-icon"></i>
+              <input type="text" id="loginUser" required placeholder="Enter username" autocomplete="username">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="loginPass">Password</label>
+            <div class="input-wrapper">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="loginPass" required placeholder="••••••••" autocomplete="current-password">
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" id="loginSubmitBtn">
+            <span>Sign In</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+          <p class="form-toggle-text">
+            Don't have an account? <span class="toggle-form-btn" id="showRegisterBtn">Sign Up</span>
+          </p>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="auth-form">
+          <h2 class="form-title">Create Account</h2>
+          <div class="form-group">
+            <label for="registerUser">Username</label>
+            <div class="input-wrapper">
+              <i data-lucide="user" class="input-icon"></i>
+              <input type="text" id="registerUser" required placeholder="Choose username" autocomplete="username">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="registerPass">Password</label>
+            <div class="input-wrapper">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="registerPass" required placeholder="Minimum 6 characters" autocomplete="new-password">
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" id="registerSubmitBtn">
+            <span>Create Account</span>
+            <i data-lucide="user-plus"></i>
+          </button>
+          <p class="form-toggle-text">
+            Already have an account? <span class="toggle-form-btn" id="showLoginBtn">Sign In</span>
+          </p>
+        </form>
+
+        <!-- Notification Banner -->
+        <div id="authAlert" class="alert-banner error hidden">
+          <i data-lucide="alert-circle" class="alert-icon"></i>
+          <span class="alert-message">Error message goes here</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Dashboard View -->
+    <div class="dashboard-view hidden" id="dashboardView">
+      
+      <!-- Top Navigation Header -->
+      <header class="dashboard-header glass-panel">
+        <div class="logo">
+          <i data-lucide="cloud-lightning" class="logo-icon text-gradient"></i>
+          <span class="logo-text">AERO<span>TEMP</span></span>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+          <form id="searchForm" class="search-form">
+            <input type="text" id="searchInput" placeholder="Search city (e.g., London, Dubai)..." autocomplete="off">
+            <button type="submit" aria-label="Search city weather" class="search-btn">
+              <i data-lucide="search"></i>
+            </button>
+          </form>
+          <button id="geoBtn" aria-label="Get local weather using GPS" class="geo-btn btn-icon" title="Use current location">
+            <i data-lucide="map-pin"></i>
+          </button>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="header-actions">
+          <!-- Temp Toggle Unit -->
+          <div class="unit-toggle-wrapper">
+            <button class="unit-btn active" id="unitCBtn">°C</button>
+            <button class="unit-btn" id="unitFBtn">°F</button>
+          </div>
+
+          <!-- User Dropdown Details -->
+          <div class="user-profile">
+            <div class="user-info">
+              <i data-lucide="user-circle-2" class="user-avatar"></i>
+              <span id="userNameText" class="user-name">Guest</span>
+            </div>
+            <button id="logoutBtn" aria-label="Sign out of application" class="logout-btn btn-icon" title="Log Out">
+              <i data-lucide="log-out"></i>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Layout Grid -->
+      <main class="dashboard-grid">
+        
+        <!-- Left Side Panel (Favorites & History) -->
+        <aside class="sidebar-panel">
+          
+          <!-- Favorites Card -->
+          <div class="sidebar-card glass-panel">
+            <div class="card-header">
+              <i data-lucide="heart" class="header-icon text-red"></i>
+              <h3>Saved Locations</h3>
+            </div>
+            <div class="sidebar-content">
+              <ul id="favoritesList" class="city-list">
+                <!-- Favorites items injected dynamically -->
+                <li class="empty-list-placeholder">No saved locations yet.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Search History Card -->
+          <div class="sidebar-card glass-panel">
+            <div class="card-header">
+              <i data-lucide="history" class="header-icon"></i>
+              <h3>Recent Searches</h3>
+              <button id="clearHistoryBtn" aria-label="Clear recent searches" class="text-btn hidden">Clear</button>
+            </div>
+            <div class="sidebar-content">
+              <ul id="historyList" class="city-list">
+                <!-- History items injected dynamically -->
+                <li class="empty-list-placeholder">Your searches will appear here.</li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Central Weather Intelligence -->
+        <section class="main-content">
+          
+          <!-- Loading Loader Overlay -->
+          <div class="loader-overlay hidden" id="dashboardLoader">
+            <div class="spinner"></div>
+            <p>Gathering atmospheric details...</p>
+          </div>
+
+          <div id="weatherContent" class="weather-content-layout">
+            <!-- Current Weather Main Row -->
+            <div class="current-weather-row">
+              
+              <!-- Core Temp Glass Card -->
+              <div class="current-card glass-panel" id="currentWeatherCard">
+                <div class="card-glow"></div>
+                <div class="current-header">
+                  <div class="location-details">
+                    <h1 id="weatherCityName">London</h1>
+                    <span id="weatherCountryCode" class="badge">GB</span>
+                  </div>
+                  <div class="date-container">
+                    <i data-lucide="calendar" class="icon-sm"></i>
+                    <span id="weatherDateText">Thursday, Jun 04</span>
+                  </div>
+                </div>
+
+                <div class="current-body">
+                  <div class="temp-section">
+                    <span id="weatherTempBig" class="temp-big">22</span>
+                    <span class="temp-degree-symbol">°</span>
+                    <div class="hi-lo-container">
+                      <div><i data-lucide="arrow-up" class="text-red"></i> <span id="weatherTempMax">24°</span></div>
+                      <div><i data-lucide="arrow-down" class="text-blue"></i> <span id="weatherTempMin">18°</span></div>
+                    </div>
+                  </div>
+
+                  <div class="status-section">
+                    <div class="weather-icon-wrapper" id="weatherIconContainer">
+                      <!-- Dynamically replaced by animated SVG weather icons -->
+                      <i data-lucide="cloud-sun" class="weather-large-icon"></i>
+                    </div>
+                    <span id="weatherDescText" class="weather-desc">Scattered Clouds</span>
+                    <span id="weatherFeelsLike" class="feels-like">Feels like 23°</span>
+                  </div>
+                </div>
+                
+                <button id="favoriteToggleBtn" aria-label="Toggle favorite" class="fav-action-btn glass-panel" title="Save Location">
+                  <i data-lucide="heart" id="favToggleIcon"></i>
+                </button>
+              </div>
+
+              <!-- Secondary Details Grid -->
+              <div class="metrics-grid">
+                
+                <!-- Metric Card 1: Wind Speed -->
+                <div class="metric-card glass-panel">
+                  <div class="metric-icon-bg bg-blue">
+                    <i data-lucide="wind" class="metric-icon"></i>
+                  </div>
+                  <div class="metric-info">
+                    <span class="metric-title">Wind Speed</span>
+                    <span id="metricWindText" class="metric-value">12 km/h</span>
+                    <span class="metric-subtitle" id="metricWindDir">From Southwest</span>
+                  </div>
+                </div>
+
+                <!-- Metric Card 2: Humidity -->
+                <div class="metric-card glass-panel">
+                  <div class="metric-icon-bg bg-green">
+                    <i data-lucide="droplets" class="metric-icon"></i>
+                  </div>
+                  <div class="metric-info">
+                    <span class="metric-title">Humidity</span>
+                    <span id="metricHumidityText" class="metric-value">64%</span>
+                    <span class="metric-subtitle">Atmospheric moisture</span>
+                  </div>
+                </div>
+
+                <!-- Metric Card 3: UV Index -->
+                <div class="metric-card glass-panel">
+                  <div class="metric-icon-bg bg-yellow">
+                    <i data-lucide="sun" class="metric-icon"></i>
+                  </div>
+                  <div class="metric-info">
+                    <span class="metric-title">UV Index</span>
+                    <span id="metricUvText" class="metric-value">5</span>
+                    <span id="metricUvLabel" class="metric-subtitle badge badge-uv-moderate">Moderate</span>
+                  </div>
+                </div>
+
+                <!-- Metric Card 4: Pressure / Visibility -->
+                <div class="metric-card glass-panel">
+                  <div class="metric-icon-bg bg-purple">
+                    <i data-lucide="compass" class="metric-icon"></i>
+                  </div>
+                  <div class="metric-info">
+                    <span class="metric-title">Pressure</span>
+                    <span id="metricPressureText" class="metric-value">1013 hPa</span>
+                    <span id="metricVisibilityText" class="metric-subtitle">10 km visibility</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Forecast and Interactive Charts Section -->
+            <div class="forecast-section-layout">
+              
+              <!-- Graph Forecast Card (24 Hour Temperature Line graph) -->
+              <div class="chart-card glass-panel">
+                <div class="card-header">
+                  <i data-lucide="trending-up" class="header-icon text-gradient-purple"></i>
+                  <h3>Temperature Trend (Next 24 Hours)</h3>
+                </div>
+                <div class="chart-container-inner">
+                  <canvas id="forecastChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Multi-day Forecast Card (5 Days) -->
+              <div class="multiday-card glass-panel">
+                <div class="card-header">
+                  <i data-lucide="calendar-days" class="header-icon"></i>
+                  <h3>5-Day Extended Forecast</h3>
+                </div>
+                <div class="multiday-list" id="multidayListContainer">
+                  <!-- Generated dynamically via JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Initialize Lucide icons on page load -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+    });
+  </script>
+  
+  <!-- JS Client Modules -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
