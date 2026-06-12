@@ -3,331 +3,204 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AeroTemp | Premium Weather Intelligence Dashboard</title>
-  <meta name="description" content="A high-fidelity weather application featuring real-time data, forecasts, custom alerts, favorites tracking, and secure user profiles.">
-  
-  <!-- Premium Google Fonts -->
+  <title>SkyPulse — Premium Weather Dashboard</title>
+  <meta name="description" content="Real-time weather forecasts with a stunning interface. Track your favorite cities and get accurate weather data.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="css/style.css">
-  
-  <!-- Chart.js CDN for beautiful forecast charts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
-  <!-- Lucide Icons CDN -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body class="theme-default">
+<body>
+  <!-- Toast container -->
+  <div id="toast-container"></div>
   
-  <!-- Background Ambient Glow Blobs -->
-  <div class="glow-bg">
-    <div class="blob blob-1" id="blob1"></div>
-    <div class="blob blob-2" id="blob2"></div>
-    <div class="blob blob-3" id="blob3"></div>
-  </div>
-
-  <!-- Main App Wrapper -->
-  <div class="app-container">
-
-    <!-- 1. Authentication View (Login/Register Card) -->
-    <div class="auth-view container-center" id="authView">
-      <div class="auth-card glass-panel fade-in">
-        <div class="auth-header">
-          <div class="logo">
-            <i data-lucide="cloud-sun" class="logo-icon text-gradient"></i>
-            <span class="logo-text">AERO<span>TEMP</span></span>
-          </div>
-          <p class="auth-subtitle">Premium Weather Analytics & Forecasts</p>
-        </div>
-
-        <!-- Login Form -->
-        <form id="loginForm" class="auth-form active">
-          <h2 class="form-title">Welcome Back</h2>
+  <!-- Auth Section (login/register) -->
+  <section id="auth-section" class="page active">
+    <!-- App branding -->
+    <div class="auth-container">
+      <div class="auth-brand">
+        <div class="brand-icon">🌤️</div>
+        <h1>SkyPulse</h1>
+        <p>Your Premium Weather Companion</p>
+      </div>
+      <!-- Login form -->
+      <div id="login-form" class="auth-form active">
+        <h2>Welcome Back</h2>
+        <form onsubmit="return false">
           <div class="form-group">
-            <label for="loginUser">Username</label>
-            <div class="input-wrapper">
-              <i data-lucide="user" class="input-icon"></i>
-              <input type="text" id="loginUser" required placeholder="Enter username" autocomplete="username">
-            </div>
+            <input type="email" id="login-email" placeholder=" " required>
+            <label for="login-email">Email Address</label>
+            <div class="input-line"></div>
           </div>
           <div class="form-group">
-            <label for="loginPass">Password</label>
-            <div class="input-wrapper">
-              <i data-lucide="lock" class="input-icon"></i>
-              <input type="password" id="loginPass" required placeholder="••••••••" autocomplete="current-password">
-            </div>
+            <input type="password" id="login-password" placeholder=" " required>
+            <label for="login-password">Password</label>
+            <div class="input-line"></div>
           </div>
-          <button type="submit" class="btn-primary" id="loginSubmitBtn">
-            <span>Sign In</span>
-            <i data-lucide="arrow-right"></i>
-          </button>
-          <p class="form-toggle-text">
-            Don't have an account? <span class="toggle-form-btn" id="showRegisterBtn">Sign Up</span>
-          </p>
+          <button type="submit" id="login-btn" class="btn-primary">Sign In</button>
         </form>
-
-        <!-- Register Form -->
-        <form id="registerForm" class="auth-form">
-          <h2 class="form-title">Create Account</h2>
+        <p class="auth-switch">Don't have an account? <a href="#" id="show-register">Create one</a></p>
+      </div>
+      <!-- Register form -->
+      <div id="register-form" class="auth-form">
+        <h2>Create Account</h2>
+        <form onsubmit="return false">
           <div class="form-group">
-            <label for="registerUser">Username</label>
-            <div class="input-wrapper">
-              <i data-lucide="user" class="input-icon"></i>
-              <input type="text" id="registerUser" required placeholder="Choose username" autocomplete="username">
-            </div>
+            <input type="text" id="register-username" placeholder=" " required>
+            <label for="register-username">Username</label>
+            <div class="input-line"></div>
           </div>
           <div class="form-group">
-            <label for="registerPass">Password</label>
-            <div class="input-wrapper">
-              <i data-lucide="lock" class="input-icon"></i>
-              <input type="password" id="registerPass" required placeholder="Minimum 6 characters" autocomplete="new-password">
-            </div>
+            <input type="email" id="register-email" placeholder=" " required>
+            <label for="register-email">Email Address</label>
+            <div class="input-line"></div>
           </div>
-          <button type="submit" class="btn-primary" id="registerSubmitBtn">
-            <span>Create Account</span>
-            <i data-lucide="user-plus"></i>
-          </button>
-          <p class="form-toggle-text">
-            Already have an account? <span class="toggle-form-btn" id="showLoginBtn">Sign In</span>
-          </p>
+          <div class="form-group">
+            <input type="password" id="register-password" placeholder=" " required>
+            <label for="register-password">Password (6+ characters)</label>
+            <div class="input-line"></div>
+          </div>
+          <button type="submit" id="register-btn" class="btn-primary">Create Account</button>
         </form>
-
-        <!-- Notification Banner -->
-        <div id="authAlert" class="alert-banner error hidden">
-          <i data-lucide="alert-circle" class="alert-icon"></i>
-          <span class="alert-message">Error message goes here</span>
-        </div>
+        <p class="auth-switch">Already have an account? <a href="#" id="show-login">Sign in</a></p>
       </div>
     </div>
-
-    <!-- 2. Dashboard View -->
-    <div class="dashboard-view hidden" id="dashboardView">
-      
-      <!-- Top Navigation Header -->
-      <header class="dashboard-header glass-panel">
-        <div class="logo">
-          <i data-lucide="cloud-lightning" class="logo-icon text-gradient"></i>
-          <span class="logo-text">AERO<span>TEMP</span></span>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="search-container">
-          <form id="searchForm" class="search-form">
-            <input type="text" id="searchInput" placeholder="Search city (e.g., London, Dubai)..." autocomplete="off">
-            <button type="submit" aria-label="Search city weather" class="search-btn">
-              <i data-lucide="search"></i>
-            </button>
-          </form>
-          <button id="geoBtn" aria-label="Get local weather using GPS" class="geo-btn btn-icon" title="Use current location">
-            <i data-lucide="map-pin"></i>
+  </section>
+  
+  <!-- Dashboard Section -->
+  <section id="dashboard-section" class="page">
+    <!-- Top navbar -->
+    <nav class="navbar">
+      <div class="nav-brand">
+        <span class="brand-icon-small">🌤️</span>
+        <span class="brand-name">SkyPulse</span>
+      </div>
+      <div class="search-container">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="city-search" placeholder="Search any city..." autocomplete="off">
+          <button id="location-btn" class="icon-btn" title="Use my location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2m0 16v2M2 12h2m16 0h2"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="8"/></svg>
           </button>
         </div>
-
-        <!-- Header Actions -->
-        <div class="header-actions">
-          <!-- Temp Toggle Unit -->
-          <div class="unit-toggle-wrapper">
-            <button class="unit-btn active" id="unitCBtn">°C</button>
-            <button class="unit-btn" id="unitFBtn">°F</button>
+      </div>
+      <div class="nav-actions">
+        <button id="unit-toggle" class="icon-btn" title="Toggle °C/°F">°C</button>
+        <div class="user-menu">
+          <button id="user-btn" class="icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+          <div id="user-dropdown" class="dropdown">
+            <p id="user-name" class="dropdown-header"></p>
+            <a href="#" id="logout-btn" class="dropdown-item">Sign Out</a>
           </div>
-
-          <!-- User Dropdown Details -->
-          <div class="user-profile">
-            <div class="user-info">
-              <i data-lucide="user-circle-2" class="user-avatar"></i>
-              <span id="userNameText" class="user-name">Guest</span>
+        </div>
+      </div>
+    </nav>
+    
+    <!-- Main content -->
+    <main class="dashboard-content">
+      <!-- Welcome/empty state -->
+      <div id="welcome-state" class="welcome-state">
+        <div class="welcome-icon">🌍</div>
+        <h2>Welcome to SkyPulse</h2>
+        <p>Search for a city or use your location to get started</p>
+      </div>
+      
+      <!-- Loading state -->
+      <div id="loading-state" class="loading-state" style="display:none">
+        <div class="loader"></div>
+        <p>Fetching weather data...</p>
+      </div>
+      
+      <!-- Weather display -->
+      <div id="weather-display" style="display:none">
+        <!-- Current weather hero -->
+        <div class="weather-hero">
+          <div class="weather-hero-left">
+            <div class="weather-location">
+              <h2 id="weather-city"></h2>
+              <p id="weather-description"></p>
             </div>
-            <button id="logoutBtn" aria-label="Sign out of application" class="logout-btn btn-icon" title="Log Out">
-              <i data-lucide="log-out"></i>
+            <div class="weather-temp-main">
+              <span id="weather-temp" class="temp-large"></span>
+              <span id="weather-icon-large" class="weather-icon-large"></span>
+            </div>
+            <div class="weather-feels">
+              <span>Feels like <span id="weather-feels"></span></span>
+            </div>
+          </div>
+          <div class="weather-hero-right">
+            <button id="fav-btn" class="fav-btn" title="Add to favorites">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </button>
           </div>
         </div>
-      </header>
-
-      <!-- Main Layout Grid -->
-      <main class="dashboard-grid">
         
-        <!-- Left Side Panel (Favorites & History) -->
-        <aside class="sidebar-panel">
-          
-          <!-- Favorites Card -->
-          <div class="sidebar-card glass-panel">
-            <div class="card-header">
-              <i data-lucide="heart" class="header-icon text-red"></i>
-              <h3>Saved Locations</h3>
-            </div>
-            <div class="sidebar-content">
-              <ul id="favoritesList" class="city-list">
-                <!-- Favorites items injected dynamically -->
-                <li class="empty-list-placeholder">No saved locations yet.</li>
-              </ul>
+        <!-- Weather details grid -->
+        <div class="weather-details-grid">
+          <div class="detail-card">
+            <div class="detail-icon">💧</div>
+            <div class="detail-info">
+              <span class="detail-value" id="weather-humidity"></span>
+              <span class="detail-label">Humidity</span>
             </div>
           </div>
-
-          <!-- Search History Card -->
-          <div class="sidebar-card glass-panel">
-            <div class="card-header">
-              <i data-lucide="history" class="header-icon"></i>
-              <h3>Recent Searches</h3>
-              <button id="clearHistoryBtn" aria-label="Clear recent searches" class="text-btn hidden">Clear</button>
-            </div>
-            <div class="sidebar-content">
-              <ul id="historyList" class="city-list">
-                <!-- History items injected dynamically -->
-                <li class="empty-list-placeholder">Your searches will appear here.</li>
-              </ul>
+          <div class="detail-card">
+            <div class="detail-icon">💨</div>
+            <div class="detail-info">
+              <span class="detail-value" id="weather-wind"></span>
+              <span class="detail-label">Wind Speed</span>
             </div>
           </div>
-        </aside>
-
-        <!-- Central Weather Intelligence -->
-        <section class="main-content">
-          
-          <!-- Loading Loader Overlay -->
-          <div class="loader-overlay hidden" id="dashboardLoader">
-            <div class="spinner"></div>
-            <p>Gathering atmospheric details...</p>
-          </div>
-
-          <div id="weatherContent" class="weather-content-layout">
-            <!-- Current Weather Main Row -->
-            <div class="current-weather-row">
-              
-              <!-- Core Temp Glass Card -->
-              <div class="current-card glass-panel" id="currentWeatherCard">
-                <div class="card-glow"></div>
-                <div class="current-header">
-                  <div class="location-details">
-                    <h1 id="weatherCityName">London</h1>
-                    <span id="weatherCountryCode" class="badge">GB</span>
-                  </div>
-                  <div class="date-container">
-                    <i data-lucide="calendar" class="icon-sm"></i>
-                    <span id="weatherDateText">Thursday, Jun 04</span>
-                  </div>
-                </div>
-
-                <div class="current-body">
-                  <div class="temp-section">
-                    <span id="weatherTempBig" class="temp-big">22</span>
-                    <span class="temp-degree-symbol">°</span>
-                    <div class="hi-lo-container">
-                      <div><i data-lucide="arrow-up" class="text-red"></i> <span id="weatherTempMax">24°</span></div>
-                      <div><i data-lucide="arrow-down" class="text-blue"></i> <span id="weatherTempMin">18°</span></div>
-                    </div>
-                  </div>
-
-                  <div class="status-section">
-                    <div class="weather-icon-wrapper" id="weatherIconContainer">
-                      <!-- Dynamically replaced by animated SVG weather icons -->
-                      <i data-lucide="cloud-sun" class="weather-large-icon"></i>
-                    </div>
-                    <span id="weatherDescText" class="weather-desc">Scattered Clouds</span>
-                    <span id="weatherFeelsLike" class="feels-like">Feels like 23°</span>
-                  </div>
-                </div>
-                
-                <button id="favoriteToggleBtn" aria-label="Toggle favorite" class="fav-action-btn glass-panel" title="Save Location">
-                  <i data-lucide="heart" id="favToggleIcon"></i>
-                </button>
-              </div>
-
-              <!-- Secondary Details Grid -->
-              <div class="metrics-grid">
-                
-                <!-- Metric Card 1: Wind Speed -->
-                <div class="metric-card glass-panel">
-                  <div class="metric-icon-bg bg-blue">
-                    <i data-lucide="wind" class="metric-icon"></i>
-                  </div>
-                  <div class="metric-info">
-                    <span class="metric-title">Wind Speed</span>
-                    <span id="metricWindText" class="metric-value">12 km/h</span>
-                    <span class="metric-subtitle" id="metricWindDir">From Southwest</span>
-                  </div>
-                </div>
-
-                <!-- Metric Card 2: Humidity -->
-                <div class="metric-card glass-panel">
-                  <div class="metric-icon-bg bg-green">
-                    <i data-lucide="droplets" class="metric-icon"></i>
-                  </div>
-                  <div class="metric-info">
-                    <span class="metric-title">Humidity</span>
-                    <span id="metricHumidityText" class="metric-value">64%</span>
-                    <span class="metric-subtitle">Atmospheric moisture</span>
-                  </div>
-                </div>
-
-                <!-- Metric Card 3: UV Index -->
-                <div class="metric-card glass-panel">
-                  <div class="metric-icon-bg bg-yellow">
-                    <i data-lucide="sun" class="metric-icon"></i>
-                  </div>
-                  <div class="metric-info">
-                    <span class="metric-title">UV Index</span>
-                    <span id="metricUvText" class="metric-value">5</span>
-                    <span id="metricUvLabel" class="metric-subtitle badge badge-uv-moderate">Moderate</span>
-                  </div>
-                </div>
-
-                <!-- Metric Card 4: Pressure / Visibility -->
-                <div class="metric-card glass-panel">
-                  <div class="metric-icon-bg bg-purple">
-                    <i data-lucide="compass" class="metric-icon"></i>
-                  </div>
-                  <div class="metric-info">
-                    <span class="metric-title">Pressure</span>
-                    <span id="metricPressureText" class="metric-value">1013 hPa</span>
-                    <span id="metricVisibilityText" class="metric-subtitle">10 km visibility</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Forecast and Interactive Charts Section -->
-            <div class="forecast-section-layout">
-              
-              <!-- Graph Forecast Card (24 Hour Temperature Line graph) -->
-              <div class="chart-card glass-panel">
-                <div class="card-header">
-                  <i data-lucide="trending-up" class="header-icon text-gradient-purple"></i>
-                  <h3>Temperature Trend (Next 24 Hours)</h3>
-                </div>
-                <div class="chart-container-inner">
-                  <canvas id="forecastChart"></canvas>
-                </div>
-              </div>
-
-              <!-- Multi-day Forecast Card (5 Days) -->
-              <div class="multiday-card glass-panel">
-                <div class="card-header">
-                  <i data-lucide="calendar-days" class="header-icon"></i>
-                  <h3>5-Day Extended Forecast</h3>
-                </div>
-                <div class="multiday-list" id="multidayListContainer">
-                  <!-- Generated dynamically via JS -->
-                </div>
-              </div>
+          <div class="detail-card">
+            <div class="detail-icon">🌡️</div>
+            <div class="detail-info">
+              <span class="detail-value" id="weather-pressure"></span>
+              <span class="detail-label">Pressure</span>
             </div>
           </div>
-        </section>
-      </main>
-    </div>
-  </div>
-
-  <!-- Initialize Lucide icons on page load -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      lucide.createIcons();
-    });
-  </script>
+          <div class="detail-card">
+            <div class="detail-icon">👁️</div>
+            <div class="detail-info">
+              <span class="detail-value" id="weather-visibility"></span>
+              <span class="detail-label">Visibility</span>
+            </div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-icon">🌅</div>
+            <div class="detail-info">
+              <span class="detail-value" id="weather-sunrise"></span>
+              <span class="detail-label">Sunrise</span>
+            </div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-icon">🌇</div>
+            <div class="detail-info">
+              <span class="detail-value" id="weather-sunset"></span>
+              <span class="detail-label">Sunset</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 5-day forecast -->
+        <div class="forecast-section">
+          <h3>5-Day Forecast</h3>
+          <div id="forecast-container" class="forecast-container"></div>
+        </div>
+      </div>
+      
+      <!-- Favorites section -->
+      <div class="favorites-section">
+        <h3 id="favorites-title" style="display:none">⭐ Favorite Cities</h3>
+        <div id="favorites-container" class="favorites-container"></div>
+      </div>
+    </main>
+  </section>
   
-  <!-- JS Client Modules -->
-  <script src="js/api.js"></script>
-  <script src="js/app.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/weather.js"></script>
+  <script src="/js/favorites.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>
