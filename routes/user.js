@@ -6,7 +6,7 @@ const {
   getFavorites,
   getHistory,
   clearHistory,
-} = require('../db/database');
+} = require('../database');
 
 const router = express.Router();
 
