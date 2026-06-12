@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
-const DB_DIR = path.join(__dirname, 'data');
+const isVercel = process.env.VERCEL === '1';
+const DB_DIR = isVercel ? path.join(os.tmpdir(), 'weather-app-data') : path.join(__dirname, 'data');
 const DB_FILE = path.join(DB_DIR, 'db.json');
 
 // Ensure database directory and file exist
